@@ -1,0 +1,388 @@
+basePath: /
+definitions:
+  domain.SignIn:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  domain.SignUp:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      retry_password:
+        type: string
+    required:
+    - email
+    - password
+    - retry_password
+    type: object
+  domain.Task:
+    properties:
+      date_time:
+        format: date-time
+        type: string
+      date_time_created:
+        format: date-time
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      is_finish:
+        type: boolean
+      title:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - is_finish
+    - title
+    type: object
+  domain.TaskInput:
+    properties:
+      date_time:
+        format: date-time
+        type: string
+      description:
+        type: string
+      title:
+        type: string
+    required:
+    - date_time
+    - title
+    type: object
+  domain.TaskUpdate:
+    properties:
+      description:
+        type: string
+      is_finish:
+        type: boolean
+      title:
+        type: string
+    type: object
+  handler.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.Refresh:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  handler.StatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  handler.allTasksResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Task'
+        type: array
+    type: object
+  pkg.TokenJWT:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+host: 127.0.0.1:8000
+info:
+  contact: {}
+  description: This is api for tasks
+  title: TasksApp API
+  version: "1.0"
+paths:
+  /api/tasks:
+    get:
+      consumes:
+      - application/json
+      description: get all tasks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.allTasksResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: allTasks
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: create task
+      parameters:
+      - description: tasks info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TaskInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: createTask
+      tags:
+      - tasks
+  /api/tasks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete task by id
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: deleteTask
+      tags:
+      - tasks
+    get:
+      consumes:
+      - application/json
+      description: get task by id
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Task'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: getTaskById
+      tags:
+      - tasks
+    put:
+      consumes:
+      - application/json
+      description: update task by id
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: tasks update info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TaskUpdate'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.StatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: updateTask
+      tags:
+      - tasks
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: registration
+      parameters:
+      - description: refresh info
+        in: body
+        name: refresh
+        required: true
+        schema:
+          $ref: '#/definitions/handler.Refresh'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.TokenJWT'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Refresh
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: login
+      parameters:
+      - description: sign-in info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SignIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.TokenJWT'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: signIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: registration
+      parameters:
+      - description: sign-up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SignUp'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: signUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
