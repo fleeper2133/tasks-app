@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   tasks-app:
     build: ./
@@ -7,6 +5,7 @@ services:
       - 8000:8000
     depends_on:
       - db
+      - migrate
     environment:
       - DB_PASSWORD=postgres
     networks:
@@ -25,17 +24,17 @@ services:
       - 5436:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d tasks"]
-      interval: 10s
+      interval: 5s
       timeout: 3s
-      retries: 5
+      retries: 10
     networks:
       - new
 
   migrate:
     image: migrate/migrate
     volumes:
-      - ./migrations:/migrations
-    command: ["-path", "/migrations", "-database", "postgres://postgres:postgres@db:5432/tasks?sslmode=disable", "up"]
+      - ./schema:/schema
+    command: ["-path", "/schema", "-database", "postgres://postgres:postgres@db:5432/tasks?sslmode=disable", "up"]
     depends_on:
       db:
         condition: service_healthy
