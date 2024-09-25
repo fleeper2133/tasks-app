@@ -27,6 +27,7 @@ func (h *Handler) InitRouter() *gin.Engine {
 		auth.POST("/sign-in", h.SignIn)
 		auth.POST("/sign-up", h.SignUp)
 		auth.POST("/refresh", h.RefreshToken)
+		auth.POST("/send-mail", h.SendMail)
 	}
 
 	api := router.Group("/api")

@@ -46,8 +46,15 @@ func Run(configPath string) {
 
 	jwtManager := pkg.NewTokenJWTManager()
 
+	mailManager := pkg.NewSendMailManager(pkg.EmailConfig{
+		From:     viper.GetString("mail.from"),
+		Password: viper.GetString("mail.password"),
+		SmtpHost: viper.GetString("mail.host"),
+		SmtpPort: viper.GetString("mail.port"),
+	})
+
 	repo := repository.NewRepository(db)
-	service := service.NewService(repo, jwtManager)
+	service := service.NewService(repo, jwtManager, mailManager)
 	handler := handler.NewHandler(service)
 
 	srv := new(server.Server)

@@ -97,3 +97,35 @@ func (h *Handler) RefreshToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, jwtTokens)
 }
+
+type EmailSending struct {
+	To      []string `json:"to" binding:"required"`
+	Message string   `json:"message" binding:"required"`
+}
+
+// @Summary      Mail
+// @Description  Send Mail
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        email body EmailSending true "email info"
+// @Success      200  {object} 	map[string]interface{}
+// @Failure      400  {object}  ErrorResponse
+// @Failure      404  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /auth/send-mail [post]
+func (h *Handler) SendMail(c *gin.Context) {
+	var input EmailSending
+	if err := c.BindJSON(&input); err != nil {
+		NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.service.Authorization.SendMail(input.To, input.Message); err != nil {
+		NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"status": "ok",
+	})
+}

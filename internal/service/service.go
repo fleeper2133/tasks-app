@@ -11,6 +11,7 @@ type Authorization interface {
 	GenerateTokens(input domain.SignIn) (pkg.TokenJWT, error)
 	ParseToken(token string) (string, error)
 	RefreshToken(refreshToken string) (pkg.TokenJWT, error)
+	SendMail(to []string, message string) error
 }
 
 type Tasks interface {
@@ -26,9 +27,9 @@ type Service struct {
 	Tasks
 }
 
-func NewService(repo *repository.Repository, jwtManager *pkg.TokenJWTManager) *Service {
+func NewService(repo *repository.Repository, jwtManager *pkg.TokenJWTManager, mailManager *pkg.SendMailManager) *Service {
 	return &Service{
-		Authorization: NewAuthorizationService(repo.Authorization, *jwtManager),
+		Authorization: NewAuthorizationService(repo.Authorization, *jwtManager, *mailManager),
 		Tasks:         NewTasksService(repo.Tasks),
 	}
 }

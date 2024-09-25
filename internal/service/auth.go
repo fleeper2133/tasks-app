@@ -15,12 +15,18 @@ const (
 )
 
 type AuthorizationService struct {
-	repo       repository.Authorization
-	jwtManager pkg.TokenJWTManager
+	repo        repository.Authorization
+	jwtManager  pkg.TokenJWTManager
+	mailManager pkg.SendMailManager
 }
 
-func NewAuthorizationService(repo repository.Authorization, jwtManager pkg.TokenJWTManager) *AuthorizationService {
-	return &AuthorizationService{repo: repo, jwtManager: jwtManager}
+func NewAuthorizationService(repo repository.Authorization, jwtManager pkg.TokenJWTManager, mailManager pkg.SendMailManager) *AuthorizationService {
+	return &AuthorizationService{repo: repo, jwtManager: jwtManager, mailManager: mailManager}
+}
+
+func (s *AuthorizationService) SendMail(to []string, message string) error {
+	byteMessage := []byte(message)
+	return s.mailManager.SendMessage(to, byteMessage)
 }
 
 func (s *AuthorizationService) CreateUser(user domain.SignUp) (int, error) {

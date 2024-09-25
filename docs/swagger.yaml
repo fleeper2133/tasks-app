@@ -67,6 +67,18 @@ definitions:
       title:
         type: string
     type: object
+  handler.EmailSending:
+    properties:
+      message:
+        type: string
+      to:
+        items:
+          type: string
+        type: array
+    required:
+    - message
+    - to
+    type: object
   handler.ErrorResponse:
     properties:
       message:
@@ -310,6 +322,41 @@ paths:
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
       summary: Refresh
+      tags:
+      - auth
+  /auth/send-mail:
+    post:
+      consumes:
+      - application/json
+      description: Send Mail
+      parameters:
+      - description: email info
+        in: body
+        name: email
+        required: true
+        schema:
+          $ref: '#/definitions/handler.EmailSending'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Mail
       tags:
       - auth
   /auth/sign-in:
